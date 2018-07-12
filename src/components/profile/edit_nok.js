@@ -9,7 +9,7 @@ import Config from '../../config';
 import { IsUndefinedOrNull } from '../../utils';
 import AuthActions from '../../actions/auth'
 
-const { updateMember } = AuthActions;
+const { updateMember, getMemberByIdAsync } = AuthActions;
 
 class EditNok extends Component {
     state = {
@@ -91,43 +91,29 @@ class EditNok extends Component {
             this.props.updateMember(mergedMember)
             .then(res => {
               if(res){
-                this.onSetModalVisible(true);
+                this.props.getMemberByIdAsync(mergedMember._id)
+                .then(member => {
+                Actions.takepic({ member: member, modalMessage: 'Profile Updated' })
+                })
+                .catch(err => {
+                ToastAndroid.showWithGravity(err, 
+                ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+                })
               } else {
-                this.onSetErrorModalVisible(true);
+                ToastAndroid.showWithGravity('Unable to update record.', 
+                ToastAndroid.SHORT, ToastAndroid.BOTTOM);
               }
             })
-            .catch(()=>{
-              this.onSetErrorModalVisible(true);
+            .catch((err)=>{
+                console.log(err)
+                ToastAndroid.showWithGravity('Error updating record.', 
+                ToastAndroid.SHORT, ToastAndroid.BOTTOM);
             });
         } else {
             ToastAndroid.showWithGravity('Fill all fields to proceed.', 
             ToastAndroid.SHORT, ToastAndroid.BOTTOM);
         }
     };
-
-    onSetModalVisible = visible => {
-        this.setState({
-            showModal: visible
-        });
-    };
-
-    onSetErrorModalVisible = visible => {
-        this.setState({
-            showErrorModal: visible
-        });
-    };
-
-    onRequestClose = () => {};
-
-    onOKay = () => {
-        this.onSetModalVisible(false);
-        Actions.popTo('allmembers');
-        Actions.refresh({key: Math.random()});
-    };
-
-    onOKayError = () => {
-        this.onSetErrorModalVisible(false);
-    }
 
     loadStates = () => {
         const results = [];
@@ -147,49 +133,6 @@ class EditNok extends Component {
         <Header pageName='Edit Profile' openMenu={this.openMenu}/>
         <ScrollView style={{ flex: 1}}>
             <View>
-            <ErrorModalView
-                    visible={this.state.showErrorModal} onRequestClose={this.onRequestClose}
-                    style={{ flex: 1, padding: 0 }}
-                    >                    
-                    <View style={{ padding: 20 }}>
-                    <Text style={{ fontSize: 20, color: '#338fc2', alignSelf: 'center'}}>Error Occured!</Text>
-                    <Text style={{ fontSize: 15, fontWeight: 'bold', alignSelf: 'center', marginTop: 20, marginBottom: 20, textAlign: 'center'}}>
-                    Could not update your profile at this time. Please try again later. If this issue persists,
-                    contact our support team on support@alliancefornewnigeria.org</Text>
-                    <Button 
-                        Text='Okay'
-                        onPress={this.onOKayError.bind(this)}
-                        style={{
-                        backgroundColor: '#db2f2f',
-                        marginLeft: 30,
-                        marginRight: 30,
-                        flex: 0,
-                        borderRadius: 10,
-                        elevation: 2
-                        }} />
-                    </View>
-                </ErrorModalView>
-                <SuccessModalView
-                    visible={this.state.showModal} onRequestClose={this.onRequestClose}
-                    style={{ flex: 1, padding: 0 }}
-                    >                    
-                    <View style={{ padding: 20 }}>
-                    <Text style={{ fontSize: 20, color: '#338fc2', alignSelf: 'center'}}>Success!</Text>
-                    <Text style={{ fontSize: 15, fontWeight: 'bold', alignSelf: 'center', marginTop: 20, marginBottom: 20, textAlign: 'center'}}>
-                    Profile Updated</Text>
-                    <Button 
-                        Text='Okay'
-                        onPress={this.onOKay.bind(this)}
-                        style={{
-                        backgroundColor: '#73b650',
-                        marginLeft: 30,
-                        marginRight: 30,
-                        flex: 0,
-                        borderRadius: 10,
-                        elevation: 2
-                        }} />
-                    </View>
-                </SuccessModalView>
                 <Text style={{ fontSize: 14, color: '#6d6d6d', alignSelf: 'center', marginTop: 10 }}>Next of kin's details</Text>
                 <View style={{ backgroundColor: '#fff', padding: 15, margin: 15, borderRadius: 10,
                 elevation: 2}}>
@@ -318,4 +261,4 @@ const mapStateToProps = state => ({
     user: state.auth.user
 });
   
-export default connect(mapStateToProps, {updateMember})(EditNok);
+export default connect(mapStateToProps, {updateMember, getMemberByIdAsync})(EditNok);

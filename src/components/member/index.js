@@ -70,13 +70,15 @@ class Members extends Component {
 
 
     replication = () => {
+        // if(this.DBRepilcator){
+        //     this.DBRepilcator.cancel();
+        //   }
         this.DBRepilcator = PouchDB.replicate(localAppDB, remoteAppDB,
           {
               live: true,
               retry: true
           })
           .on('change', (info) => {
-            console.log('replicating', info);
             info.docs.forEach((rec) => {
                 UpdateSyncDoc(rec._id, this.props.memberListChanged);
             });

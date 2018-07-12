@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Actions } from 'react-native-router-flux';
 import PouchDB from 'pouchdb-react-native';
 import moment from 'moment';
-import { Button, TextBox, Dropdown, SuccessModalView, ErrorModalView, MainMenu, Header} from '../common'
+import { Button, MainMenu, Header} from '../common'
 import Config from '../../config';
 import { IsUndefinedOrNull } from '../../utils';
 import AuthActions from '../../actions/auth';
@@ -19,12 +19,10 @@ class NOK extends Component {
         firstName: '',
         surname: '',
         dob: "Next of kin's Date of birth",
-        showModal: false,
         state: 'state',
         nationality: 'nationality',
         email: '',
         phone: '',
-        showErrorModal: false,
         error: ''
     }
 
@@ -57,7 +55,7 @@ class NOK extends Component {
 
     onRegister = () => {
         const validateForm = () => (
-            true
+            true // hack to bypass validation
         );
         if(validateForm()){
             const member = this.props.member;
@@ -82,45 +80,19 @@ class NOK extends Component {
             .then(res => {
                 localAppDB.get(res.id)
                 .then(v=> {
-                    this.props.memberListAdd(v);
+                    Actions.takepic({ member: v, modalMessage: 'Awaiting approval from ANN HQ.' })
                 })
                 .catch(err=>console.log(err))
-                this.onSetModalVisible(true);
             })
             .catch(err => {
                 console.log(err);
                 this.setState({error: err.message});
-                this.onSetErrorModalVisible(true);
             })
         } else {
             ToastAndroid.showWithGravity('Fill all fields to proceed.', 
             ToastAndroid.SHORT, ToastAndroid.BOTTOM);
         }
     };
-
-    onSetModalVisible = visible => {
-        this.setState({
-            showModal: visible
-        });
-    };
-
-    onSetErrorModalVisible = visible => {
-        this.setState({
-            showErrorModal: visible
-        });
-    };
-
-    onRequestClose = () => {};
-
-    onOKay = () => {
-        this.onSetModalVisible(false);
-        Actions.allmembers();
-        Actions.refresh({key: Math.random()});
-    };
-
-    onOKayError = () => {
-        this.onSetErrorModalVisible(false);
-    }
 
     loadStates = () => {
         const results = [];
@@ -144,48 +116,6 @@ class NOK extends Component {
             <Header pageName='New Member' openMenu={this.openMenu}/>
             <ScrollView>
                 <View style={{ flex: 1 }}>
-                <ErrorModalView
-                    visible={this.state.showErrorModal} onRequestClose={this.onRequestClose}
-                    style={{ flex: 1, padding: 0 }}
-                    >                    
-                    <View style={{ padding: 20 }}>
-                    <Text style={{ fontSize: 20, color: '#338fc2', alignSelf: 'center'}}>Error Occured!</Text>
-                    <Text style={{ fontSize: 15, fontWeight: 'bold', alignSelf: 'center', marginTop: 20, marginBottom: 20, textAlign: 'center'}}>
-                    {this.state.error}</Text>
-                    <Button 
-                        Text='Okay'
-                        onPress={this.onOKayError.bind(this)}
-                        style={{
-                        backgroundColor: '#db2f2f',
-                        marginLeft: 30,
-                        marginRight: 30,
-                        flex: 0,
-                        borderRadius: 10,
-                        elevation: 2
-                        }} />
-                    </View>
-                </ErrorModalView>
-                <SuccessModalView
-                    visible={this.state.showModal} onRequestClose={this.onRequestClose}
-                    style={{ flex: 1, padding: 0 }}
-                    >                    
-                    <View style={{ padding: 20 }}>
-                    <Text style={{ fontSize: 20, color: '#338fc2', alignSelf: 'center'}}>Registration Submitted!</Text>
-                    <Text style={{ fontSize: 15, fontWeight: 'bold', alignSelf: 'center', marginTop: 20, marginBottom: 20, textAlign: 'center'}}>
-                    Awaiting approval from ANN HQ.</Text>
-                    <Button 
-                        Text='Okay'
-                        onPress={this.onOKay.bind(this)}
-                        style={{
-                        backgroundColor: '#73b650',
-                        marginLeft: 30,
-                        marginRight: 30,
-                        flex: 0,
-                        borderRadius: 10,
-                        elevation: 2
-                        }} />
-                    </View>
-                </SuccessModalView>
                 <Text style={{ fontSize: 14, color: '#6d6d6d', alignSelf: 'center', marginTop: 10 }}>Next of kin's details</Text>
                 <View style={{ backgroundColor: '#fff', padding: 15, margin: 15, borderRadius: 10,
                 elevation: 2}}>
@@ -270,7 +200,7 @@ class NOK extends Component {
 
                 </View>
                 <Button 
-                Text='Register'
+                Text='Take Photo & Register'
                 onPress={this.onRegister}
                 style={{
                 backgroundColor: '#73b650',

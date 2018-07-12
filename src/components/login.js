@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { Image, View, Text, Keyboard, Picker, Animated, TouchableOpacity, ScrollView } from 'react-native';
+import { Image, View, Text, Keyboard, TouchableOpacity, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import PouchDB from 'pouchdb-react-native';
 import { Actions } from 'react-native-router-flux'
-import _ from 'lodash';
 import { Button, TextBox, Spinner } from './common';
 import Config from '../../src/config';
 import AuthActions from '../actions/auth';
@@ -173,12 +172,6 @@ class Login extends Component {
           <View style={{ height: 150 }} >
             {this.renderButton()}
             {this.renderError()}
-          </View>
-          <View style={{ padding: 20, flexDirection: 'row', justifyContent: 'center'}}>
-          <Text>Want to be a member? </Text>
-          <TouchableOpacity style={{ flex: 0 }} onPress={this.onSignUp}>
-            <Text style={{ flex: 0, color: '#73b650', fontWeight: 'bold' }}>Sign Up, it's Free</Text>
-          </TouchableOpacity>
           </View>
         </View>
       </View>

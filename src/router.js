@@ -3,7 +3,7 @@ import { Router, Scene } from 'react-native-router-flux';
 import Main from './components/main';
 import Login from './components/login';
 import Profile from './components/profile'
-import TakePic from './components/profile/takePic'
+import TakePic from './components/register/takePic'
 import EditProfile from './components/profile/edit_profile'
 import EditNok from './components/profile/edit_nok'
 import Register from './components/register'

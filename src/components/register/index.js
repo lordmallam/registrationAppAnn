@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Actions } from 'react-native-router-flux';
 import PouchDB from 'pouchdb-react-native';
 import moment from 'moment';
-import { Button, TextBox, Dropdown, MainMenu, Header } from '../common'
+import { Button, MainMenu, Header } from '../common'
 import Config from '../../config';
 import { IsUndefinedOrNull } from '../../utils'
 

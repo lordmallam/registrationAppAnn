@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ScrollView, ToastAndroid, TouchableOpacity } from 'react-native';
+import { Text, View, ScrollView, ToastAndroid, Image } from 'react-native';
 import { connect } from 'react-redux';
 import PouchDB from 'pouchdb-react-native';
 import _ from 'lodash';
@@ -23,19 +23,19 @@ class Main extends Component {
     this.props.getCurrentUserAsync()
     .then(user => {
       if(user){
-        //this.replication();
+        this.replication();
         this.props.systemDataChanged();
       } else {
-        Actions.auth({type: ActionConst.RESET});
+        Actions.reset('auth');
       }
     })
     .catch(err => {
       console.log(err);
-      Actions.auth({type: ActionConst.RESET});
+      Actions.reset('auth');
     });
   }
 
-  replication = member => {
+  replication = () => {
     if(this.DBRepilcator){
       this.DBRepilcator.cancel();
     }
@@ -45,16 +45,10 @@ class Main extends Component {
           retry: true
       })
       .on('change', (info) => {
-        console.log('replicating', info);
         info.docs.forEach((rec) => {
             UpdateSyncDoc(rec._id, this.props.updateMember);
         });
       })
-      .on('paused', function (info) {
-      console.log('paused', info);
-    }).on('active', function (info) {
-      console.log('active', info);
-    })
       .on('error', info => {
           console.log('Replication to Remote Error', info);
           ToastAndroid.showWithGravity('Error replicating your data', 
@@ -64,6 +58,11 @@ class Main extends Component {
 
   newMember = () => {
     Actions.personal();
+  }
+
+  comingSoon = () => {
+    ToastAndroid.showWithGravity('Coming soon !!!', 
+          ToastAndroid.SHORT, ToastAndroid.BOTTOM);
   }
 
   openMenu = () => {
@@ -84,9 +83,15 @@ class Main extends Component {
               <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#3a6a75', alignSelf: 'center', marginTop: 30}}>
               Welcome {this.props.user.firstname}!</Text>
               <View style={{ marginTop: 30, marginBottom: 20, marginLeft: 20, marginRight: 20, backgroundColor: '#fff',
-              borderRadius: 10, elevation: 4, padding: 10, flexDirection: 'row'}}>
-                <View style={{ marginRight: 30, marginLeft: 30}}>
-                </View>
+              borderRadius: 10, elevation: 4, padding: 20, flexDirection: 'row'}}>
+                <View style={{ alignItems: 'center', flex: 1 }}>
+                <Image
+                  style={styles.logoStyle} resizeMode='contain'
+                  source={Config.resources.logo}
+                />
+                <Text style={{ alignSelf: 'center', fontSize: 18, fontWeight: 'bold', color: '#73b650', marginBottom: 10}}>
+                Member Registration</Text>
+              </View>
               </View>
               </View>
             ) : (null)}
@@ -101,10 +106,10 @@ class Main extends Component {
           </View>
           <View style={{ flexDirection: 'row', marginBottom: 3, marginTop: 3, marginLeft: 10, marginRight: 10 }}>
             <View style={{ flex: 1}}>
-              <Card text='Complaints' icon='&#xf071;' color='#b65c50'/>
+              <Card text='Complaints' icon='&#xf071;' color='#b65c50' onPress={() => this.comingSoon()}/>
             </View>
             <View style={{ flex: 1}}>
-              <Card text='FAQs' icon='&#xf059;' color='#73b650'/>
+              <Card text='FAQs' icon='&#xf059;' color='#73b650' onPress={() => this.comingSoon()}/>
             </View>
           </View>
           </View>
@@ -112,6 +117,14 @@ class Main extends Component {
         </ScrollView>
       </MainMenu>
     );
+  }
+}
+
+const styles = {
+  logoStyle: {
+    width: 100,
+    height: 100,
+    marginBottom: 30
   }
 }
 

@@ -1,15 +1,15 @@
 const logo = require('../src/images/logo.png');
-const hostIP = '192.168.8.5';
+const hostIP = 'ann.westeurope.cloudapp.azure.com';
 const host = `http://${hostIP}`;
-const dbHost = `http://admin:Password1@${hostIP}:5984/`;
+const dbHost = `http://annadmin:password@${hostIP}:5984/`;
 const db_name = 'ann_db';
 
 const Config = {
   environmentAuthority: {
     couchdbUrl: `${dbHost}`, // CouchDB instance where environment_db resides.
     remoteDB: `${db_name}`,
-    apiUrl: `${host}:9001/api/`,
-    umsUrl: `${host}:9001/ums/`
+    apiUrl: `${host}/api/`,
+    umsUrl: `${host}/ums/`
   },
   db: {
     localDB_SystemData: 'sysDataRegister',

@@ -78,19 +78,21 @@ memberListAdd = member => ({
 });
 
 const updateMember = member => dispatch => (new Promise((resolve, reject) => {
-  if(member._id){
+  if (member._id) {
     member.modifiedOn = new Date()
-      localAppDB.put(member)
-      .then(m =>{
-        localAppDB.get(m.id)
-        .then(v=> {
-          dispatch(memberListChanged(v))
-        })
-        .catch(err=>console.log(err))        
+    delete member._rev
+    localAppDB.get(member._id)
+    .then(m => {
+      const updatedMember = Object.assign(m, member);
+      localAppDB.put(updatedMember)
+      .then(() => {
+        dispatch(memberListChanged(updatedMember))
         resolve(true)
       })
-      .catch(err=>{console.log(err); reject(false)})
-  }else{
+      .catch(err=> {console.log(err); reject(false)})
+    })
+    .catch(err=>{console.log(err); reject(false)})
+  } else {
     reject(false);
   }
 }));
@@ -128,10 +130,12 @@ const loginUser = (credentials) => (dispatch) => {
               dispatch(loginFailed('No such user'));
             });
         } else {
+          console.log(data)
           dispatch(loginFailed('Wrong username or password'));
         }
       })
       .catch(err => {
+        console.log(err)
         if(reached){
           dispatch({ type: Types.LOGIN_FAILED, payload: 'Wrong username or password' });
         } else {
@@ -152,7 +156,7 @@ const storeSysDataLocally = (db, user, dispatch) => {
     db.post(user)
     .then(() => {
       dispatch(setLoginUser(user));
-      Actions.main();
+      Actions.reset('main');
     })
     .catch(err => { 
       console.log(err);
@@ -202,6 +206,14 @@ const getMemberAsync = () => (dispatch) => (new Promise((resolve, reject) => {
     .catch(err => reject(`No member profile on file : ${err}`));
 }));
 
+const getMemberByIdAsync = id => dispatch => (new Promise((resolve, reject) => {
+  localAppDB.get(id)
+    .then(member => {
+      resolve(member);
+    })
+    .catch(err => reject(`No member profile on file : ${err}`));
+}));
+
 const systemDataChanged = () => dispatch => {
   localSysDB.allDocs()
   .then(rec => {
@@ -230,7 +242,8 @@ const AuthActions = {
   memberListRemove,
   memberListAdd,
   membersChanged,
-  selectedMemberChanged
+  selectedMemberChanged,
+  getMemberByIdAsync
 };
 
 export default AuthActions;
