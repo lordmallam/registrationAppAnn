@@ -11,8 +11,8 @@ import PouchDBOps from '../utils/pouchdb';
 const { emailChanged, passwordChanged, loginUser, setLoginUser, getCurrentUserAsync, loginFailed, systemDataChanged } = AuthActions;
 const { ResetDB } = PouchDBOps;
 
-const localSysDB = new PouchDB(Config.db.localDB_SystemData, { adapter: 'asyncstorage' });
-const localAppDB = new PouchDB(Config.db.localDB_AppData, { adapter: 'asyncstorage' });
+let localSysDB = new PouchDB(Config.db.localDB_SystemData);
+const localAppDB = new PouchDB(Config.db.localDB_AppData);
 const remoteAppDB = new PouchDB(Config.db.remoteDB);
 
 class Login extends Component {
@@ -28,8 +28,19 @@ class Login extends Component {
   sysRepilcator = null;
 
   componentDidMount() {
-    ResetDB(localAppDB).catch(err=>console.log(err));
-    ResetDB(localSysDB).then(db => {localSysDB = db; this.replication();}).catch(err=>console.log(err));
+    ResetDB(localAppDB)
+    .catch(err=> {
+      console.log(err)
+    });
+    ResetDB(localSysDB)
+    .then(db => {
+      localSysDB = db; 
+      this.replication();
+    })
+    .catch(err=> {
+      console.log(err);
+      this.replication()
+    });
   }
 
   onUsernameChanged(text) {
@@ -55,9 +66,6 @@ class Login extends Component {
   };
 
   replication = () => {
-    if(this.sysRepilcator){
-      this.sysRepilcator.cancel();
-    }
     this.sysRepilcator = PouchDB.replicate(remoteAppDB, localSysDB,
       {
         filter: 'mobile/by-systemData',

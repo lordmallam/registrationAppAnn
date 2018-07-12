@@ -81,7 +81,7 @@ class Main extends Component {
             {this.props.user ? (
               <View>
               <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#3a6a75', alignSelf: 'center', marginTop: 30}}>
-              Welcome {this.props.user.firstname}!</Text>
+              Welcome {this.props.user.surname}</Text>
               <View style={{ marginTop: 30, marginBottom: 20, marginLeft: 20, marginRight: 20, backgroundColor: '#fff',
               borderRadius: 10, elevation: 4, padding: 20, flexDirection: 'row'}}>
                 <View style={{ alignItems: 'center', flex: 1 }}>

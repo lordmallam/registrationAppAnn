@@ -79,6 +79,7 @@ const ResetDB = (db) => new Promise((resolve, reject) => {
         resolve(new PouchDB(dbName));
     })
     .catch(err => {
+      console.log(err)
         reject(new PouchDB(dbName));        
  });
 });
